@@ -84,11 +84,26 @@
 <script>
 /* ================= datos ================= */
 const SKILLS = {
-  handstand:{label:"Handstand", hint:"Cara a la pared"},
-  lsit:{label:"L-sit", hint:"Piernas rectas, hombros abajo"},
-  planche:{label:"Planche lean", hint:"Codos bloqueados"},
-  frontlever:{label:"Front lever", hint:"Advanced tuck, espalda plana"}
+  handstand:{label:"Handstand", hint:"Cara a la pared", cues:[
+    "Panza a la pared, no la espalda","Costillas metidas, glúteo apretado",
+    "Empuja el suelo con los dedos","Si molesta la muñeca, usa paralletes"]},
+  lsit:{label:"L-sit", hint:"Piernas rectas", cues:[
+    "Piernas rectas, punta estirada","Hombros deprimidos: empuja el suelo hacia abajo",
+    "Si las piernas bajan, corta la serie","A los 30 s limpios: pasa a L-sit → tuck planche"]},
+  planche:{label:"Planche lean", hint:"Codos bloqueados", cues:[
+    "Codos bloqueados — si se doblan, no cuenta","Escápulas protraídas: saca joroba",
+    "Inclínate hasta que tiemble","El tuck sale del lean, no al revés"]},
+  frontlever:{label:"Front lever", hint:"Advanced tuck", cues:[
+    "Espalda plana — si se arquea, es tuck falso","Brazos bloqueados, hombros deprimidos",
+    "Mira hacia tus pies, no arriba","La banda va al final, no al inicio"]}
 };
+
+const PREP = [
+  "Muñecas: círculos + peso adelante/atrás",
+  "Pronación/supinación 2 x 15 por brazo",
+  "Círculos de codo 2 x 10 cada dirección",
+  "Protracción escapular 2 x 10"
+];
 
 const DAYS = {
   1:{name:"Lunes",title:"Push pesado",place:"Casa",skills:["handstand","lsit","planche"],ex:[
@@ -122,12 +137,18 @@ const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(data)); }catc
 
 let cursor = new Date();
 let tab = "hoy";
+let openCue = "";
 
 const iso = d => { const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4); return z.toISOString().slice(0,10); };
 const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-function sess(){ const k=iso(cursor); if(!data.sessions[k]) data.sessions[k]={done:{},skills:{},rules:{},cindy:"",notes:""}; return data.sessions[k]; }
+function sess(){
+  const k=iso(cursor);
+  if(!data.sessions[k]) data.sessions[k]={done:{},skills:{},rules:{},prep:{},cindy:"",notes:""};
+  if(!data.sessions[k].prep) data.sessions[k].prep={};
+  return data.sessions[k];
+}
 
 /* ================= audio ================= */
 let ac=null;
@@ -280,14 +301,31 @@ function render(){
           </div>
         </div>`;
       } else {
+        h += `<div style="padding-bottom:10px;margin-bottom:6px;border-bottom:1px solid var(--line)">
+          <div class="sub" style="margin:0 0 8px">PREP 2 MIN · PROTEGE CODO Y MUÑECA</div>`;
+        PREP.forEach((p,i)=>{
+          const on=!!s.prep[i];
+          h += `<button class="check" style="border-bottom:none;padding:7px 0" onclick="sess().prep[${i}]=!sess().prep[${i}];save();render()">
+            <span class="dot ${on?"on":""}" style="width:15px;height:15px"></span>
+            <span style="font-size:12.5px;color:${on?"var(--chalk)":"var(--muted)"}">${esc(p)}</span></button>`;
+        });
+        h += `</div>`;
+
         plan.skills.forEach(sk=>{
-          const logged=s.skills[sk], pr=bestOf(sk).best;
-          h += `<div class="row">
-            <div style="min-width:0">
-              <div style="font-size:15px;font-weight:500">${esc(SKILLS[sk].label)}</div>
-              <div class="sub">${logged?`hoy ${logged}s`:"sin registro"}${pr?` · récord ${pr}s`:""}</div>
+          const logged=s.skills[sk], pr=bestOf(sk).best, open=openCue===sk;
+          h += `<div style="border-bottom:1px solid var(--line)">
+            <div class="row" style="border-bottom:none">
+              <div style="min-width:0">
+                <div style="font-size:15px;font-weight:500">${esc(SKILLS[sk].label)}
+                  <button onclick="openCue='${open?"":sk}';render()"
+                    style="background:none;border:1px solid var(--line);color:var(--muted);width:20px;height:20px;border-radius:10px;font-size:11px;margin-left:7px;cursor:pointer;vertical-align:middle">${open?"×":"i"}</button>
+                </div>
+                <div class="sub">${logged?`hoy ${logged}s`:"sin registro"}${pr?` · récord ${pr}s`:""}</div>
+              </div>
+              <button class="btn-s" onclick="startPrep('${sk}')">Cronometrar</button>
             </div>
-            <button class="btn-s" onclick="startPrep('${sk}')">Cronometrar</button>
+            ${open?`<ul style="margin:0 0 12px;padding-left:18px;color:var(--muted);font-size:12.5px;line-height:1.7">
+              ${SKILLS[sk].cues.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`:""}
           </div>`;
         });
         h += `<div style="display:flex;align-items:center;gap:10px;padding-top:12px;margin-top:4px;border-top:1px solid var(--line)">
