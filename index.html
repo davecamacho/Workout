@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14161A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Registro</title>
+<style>
+  :root{
+    --bg:#14161A; --surface:#1C1F26; --up:#232730; --line:#2E333D;
+    --chalk:#E9E5DC; --muted:#868C99; --amber:#F0B429; --teal:#4FC3B0; --red:#E5614A;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;background:var(--bg);color:var(--chalk);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding-bottom:calc(84px + env(safe-area-inset-bottom));
+    -webkit-user-select:none;user-select:none;
+  }
+  input,textarea,button{font-family:inherit;}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+  .wrap{padding:0 16px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  header{padding:20px 16px 12px;display:flex;align-items:center;justify-content:space-between;}
+  .nav{background:none;border:1px solid var(--line);color:var(--muted);width:38px;height:38px;border-radius:19px;font-size:20px;line-height:1;cursor:pointer;}
+  .dayname{font-size:20px;font-weight:600;}
+  .daydate{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px;}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px;}
+  .btn-s{background:var(--up);border:1px solid var(--line);color:var(--chalk);padding:10px 15px;border-radius:9px;font-size:13px;cursor:pointer;flex-shrink:0;}
+  .btn-b{border:none;padding:14px 26px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;}
+  .check{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;border-bottom:1px solid var(--line);padding:12px 0;cursor:pointer;text-align:left;color:inherit;}
+  .check:last-child{border-bottom:none;}
+  .box{width:20px;height:20px;flex-shrink:0;border-radius:5px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--bg);}
+  .box.on{border-color:var(--teal);background:var(--teal);}
+  .dot{width:18px;height:18px;flex-shrink:0;border-radius:9px;border:1.5px solid var(--line);}
+  .dot.on{border-color:var(--amber);background:var(--amber);}
+  .lbl{font-size:14px;}
+  .lbl.done{color:var(--muted);text-decoration:line-through;}
+  input[type=number],textarea{background:var(--up);border:1px solid var(--line);border-radius:9px;color:var(--chalk);padding:11px 13px;font-size:17px;font-family:var(--mono);}
+  input[type=number]{width:110px;}
+  textarea{width:100%;font-family:inherit;font-size:14px;resize:vertical;}
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
+  nav.tabs button{flex:1;padding:15px 0 18px;background:none;border:none;border-top:2px solid transparent;color:var(--muted);font-size:12.5px;cursor:pointer;}
+  nav.tabs button.on{border-top-color:var(--amber);color:var(--chalk);font-weight:600;}
+  .big{font-family:var(--mono);font-size:64px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;}
+  .stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .stat .v{font-family:var(--mono);font-size:30px;margin-top:8px;font-variant-numeric:tabular-nums;}
+  .strip{display:flex;gap:6px;}
+  .strip>div{flex:1;text-align:center;}
+  .bar{height:42px;border-radius:7px;border:1px solid var(--line);}
+  .bar.on{border-color:var(--teal);background:var(--teal);}
+  .bar.rest{background:var(--up);opacity:.5;}
+  .pr{font-family:var(--mono);font-size:26px;font-variant-numeric:tabular-nums;}
+  @keyframes breathe{0%,100%{opacity:1}50%{opacity:.45}}
+  .breathe{animation:breathe 2s ease-in-out infinite;}
+  .adj{background:var(--up);border:1px solid var(--line);color:var(--chalk);width:52px;height:52px;border-radius:26px;font-size:22px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="nav" id="prev" aria-label="Día anterior">‹</button>
+  <div style="text-align:center">
+    <div class="dayname" id="dayname"></div>
+    <div class="daydate" id="daydate"></div>
+  </div>
+  <button class="nav" id="next" aria-label="Día siguiente">›</button>
+</header>
+
+<div class="wrap" id="view"></div>
+
+<nav class="tabs">
+  <button data-tab="hoy" class="on">Sesión</button>
+  <button data-tab="records">Récords</button>
+  <button data-tab="semana">Semana</button>
+</nav>
+
+<script>
+/* ================= datos ================= */
+const SKILLS = {
+  handstand:{label:"Handstand", hint:"Cara a la pared"},
+  lsit:{label:"L-sit", hint:"Piernas rectas, hombros abajo"},
+  planche:{label:"Planche lean", hint:"Codos bloqueados"},
+  frontlever:{label:"Front lever", hint:"Advanced tuck, espalda plana"}
+};
+
+const DAYS = {
+  1:{name:"Lunes",title:"Push pesado",place:"Casa",skills:["handstand","lsit","planche"],ex:[
+    "Bench Press 5 x 5","Incline DB Press 4 x 8-10","Shoulder Press sentado 4 x 8",
+    "Lateral Raises 4 x 15","Press Francés 3 x 12","Ab Wheel 4 x fallo técnico"]},
+  2:{name:"Martes",title:"Pull explosivo",place:"Parque",skills:["handstand","frontlever"],ex:[
+    "Front Lever Pulls 4 x 5-6","Muscle Ups 3 series","Pull Ups lastradas 3 x 6-8",
+    "Dips lastradas 3 x 8-12","Leg Raises colgado 4 x 12"]},
+  3:{name:"Miércoles",title:"Piernas bilateral",place:"Casa",skills:[],ex:[
+    "Bulgarian Split Squat 4 x 8-10","Romanian Deadlift 4 x 10-12","Goblet Squat 3 x 15",
+    "Calf Raises 4 x 20","Plancha con peso 3 x 60 s"]},
+  4:{name:"Jueves",title:"Upper con mancuernas",place:"Casa",skills:["handstand","lsit","planche"],ex:[
+    "Incline DB Press 4 x 8-10","One-Arm DB Row 4 x 8","Pseudo Planche Push Ups 3 x 8-10",
+    "Chest Supported Row 3 x 12","Arnold Press sentado 3 x 12","Lateral Raises 3 x 15",
+    "Hammer Curls 3 x 10","Hollow Hold 3 x 45 s"]},
+  5:{name:"Viernes",title:"Circuito Cindy",place:"Parque",skills:["lsit","frontlever","planche"],cindy:true,ex:[
+    "Cindy 20 min — 5 pull ups / 10 push ups / 15 sit ups"]},
+  6:{name:"Sábado",title:"Piernas unilateral",place:"Casa",skills:[],ex:[
+    "Zancadas atrás con mancuernas 3 x 12","Skater Squat a la silla 3 x 8-10 por pierna",
+    "Hip Thrust 1 pierna 3 x 10","Calf Raises 1 pierna 3 x 15","Copenhagen Plank 3 x 20 s por lado"]},
+  0:{name:"Domingo",title:"Descanso",place:"",skills:[],ex:[]}
+};
+
+const RULES = ["Skill primero, con todo fresco","Ningún skill al fallo","Brazos bloqueados en holds"];
+const KEY = "trainlog-v1";
+
+/* ================= estado ================= */
+let data = {sessions:{}, weights:{}, prep:5};
+try{ const raw = localStorage.getItem(KEY); if(raw) data = Object.assign(data, JSON.parse(raw)); }catch(e){}
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){ console.error(e); } };
+
+let cursor = new Date();
+let tab = "hoy";
+
+const iso = d => { const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4); return z.toISOString().slice(0,10); };
+const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function sess(){ const k=iso(cursor); if(!data.sessions[k]) data.sessions[k]={done:{},skills:{},rules:{},cindy:"",notes:""}; return data.sessions[k]; }
+
+/* ================= audio ================= */
+let ac=null;
+function beep(freq, ms, vol){
+  try{
+    if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==="suspended") ac.resume();
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type="sine"; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol||.25, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime+ms/1000);
+    o.connect(g); g.connect(ac.destination);
+    o.start(); o.stop(ac.currentTime+ms/1000);
+  }catch(e){}
+}
+
+/* ================= cronómetro ================= */
+let T = {mode:"idle", skill:null, secs:0, tick:null, lastBeep:-1, wake:null};
+
+async function keepAwake(on){
+  try{
+    if(on && "wakeLock" in navigator){ T.wake = await navigator.wakeLock.request("screen"); }
+    else if(T.wake){ T.wake.release(); T.wake=null; }
+  }catch(e){}
+}
+
+function startPrep(skill){
+  T.skill=skill; T.mode="prep"; T.secs=data.prep; T.lastBeep=-1;
+  beep(600,120);
+  keepAwake(true);
+  clearInterval(T.tick);
+  const t0=Date.now(), total=data.prep;
+  T.tick=setInterval(()=>{
+    const left = total - Math.floor((Date.now()-t0)/1000);
+    if(left!==T.secs){ T.secs=left; if(left>0) beep(600,120); }
+    if(left<=0){ clearInterval(T.tick); beep(1000,320,.35); startRun(); }
+    render();
+  },100);
+  render();
+}
+
+function startRun(){
+  T.mode="run"; T.secs=0; T.lastBeep=0;
+  const t0=Date.now();
+  clearInterval(T.tick);
+  T.tick=setInterval(()=>{
+    const s=Math.floor((Date.now()-t0)/1000);
+    if(s!==T.secs){
+      T.secs=s;
+      if(s>0 && s%5===0){ beep(760,90,.2); }
+      render();
+    }
+  },100);
+  render();
+}
+
+function stopRun(){
+  clearInterval(T.tick);
+  beep(420,260,.3);
+  keepAwake(false);
+  T.mode="confirm";
+  render();
+}
+
+function cancelTimer(){
+  clearInterval(T.tick); keepAwake(false);
+  T.mode="idle"; T.skill=null; T.secs=0; render();
+}
+
+function commitTimer(){
+  const s=sess();
+  const prev=s.skills[T.skill]||0;
+  if(T.secs>prev) s.skills[T.skill]=T.secs;
+  save();
+  T.mode="idle"; T.skill=null; T.secs=0;
+  render();
+}
+
+/* ================= métricas ================= */
+function bestOf(skill){
+  let best=0,when=null;
+  for(const [d,v] of Object.entries(data.sessions)){
+    const val=v.skills&&v.skills[skill];
+    if(val&&val>best){best=val;when=d;}
+  }
+  return {best,when};
+}
+function bestCindy(){
+  let b=0;
+  for(const v of Object.values(data.sessions)){ const n=parseFloat(v.cindy); if(!isNaN(n)&&n>b) b=n; }
+  return b;
+}
+function didTrain(s){ return !!s && (Object.values(s.done||{}).some(Boolean) || Object.keys(s.skills||{}).length>0); }
+function adherence(weeks){
+  let hit=0,target=0;
+  for(let i=0;i<weeks*7;i++){
+    const d=addDays(new Date(),-i);
+    if(d.getDay()===0) continue;
+    target++;
+    if(didTrain(data.sessions[iso(d)])) hit++;
+  }
+  return target?Math.round(hit/target*100):0;
+}
+
+/* ================= render ================= */
+function render(){
+  const dow=cursor.getDay(), plan=DAYS[dow], s=sess(), k=iso(cursor);
+  document.getElementById("dayname").textContent=plan.name;
+  document.getElementById("daydate").textContent =
+    cursor.toLocaleDateString("es-MX",{day:"numeric",month:"short"}) + (k===iso(new Date())?" · hoy":"");
+
+  const v=document.getElementById("view");
+  let h="";
+
+  if(tab==="hoy"){
+    h += `<div class="card"><div class="eyebrow">Sesión</div>
+      <div style="font-size:17px;font-weight:600">${esc(plan.title)}</div>
+      ${plan.place?`<div class="sub">${esc(plan.place.toUpperCase())}</div>`:""}</div>`;
+
+    if(plan.skills.length){
+      h += `<div class="card"><div class="eyebrow">Bloque skill · aguante en segundos</div>`;
+
+      if(T.mode==="prep"){
+        h += `<div style="text-align:center;padding:14px 0">
+          <div class="big" style="color:var(--teal)">${T.secs}</div>
+          <div style="font-size:13px;color:var(--muted);margin:10px 0 16px">Acomódate — arranca en el beep largo</div>
+          <button class="btn-b" style="background:var(--up);color:var(--chalk)" onclick="cancelTimer()">Cancelar</button>
+        </div>`;
+      } else if(T.mode==="run"){
+        h += `<div style="text-align:center;padding:14px 0">
+          <div class="big breathe" style="color:var(--amber)">${T.secs}</div>
+          <div style="font-size:13px;color:var(--muted);margin:10px 0 16px">${esc(SKILLS[T.skill].label)} · beep cada 5 s</div>
+          <button class="btn-b" style="background:var(--amber);color:var(--bg)" onclick="stopRun()">Detener</button>
+        </div>`;
+      } else if(T.mode==="confirm"){
+        const pr=bestOf(T.skill).best;
+        h += `<div style="text-align:center;padding:14px 0">
+          <div class="eyebrow" style="margin-bottom:14px">Ajusta lo que tardaste en picarle</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:20px">
+            <button class="adj" onclick="T.secs=Math.max(0,T.secs-1);render()">−</button>
+            <div class="big" style="color:var(--amber);min-width:90px">${T.secs}</div>
+            <button class="adj" onclick="T.secs=T.secs+1;render()">+</button>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin:14px 0 16px">
+            ${esc(SKILLS[T.skill].label)}${pr?` · récord actual ${pr}s`:""}
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center">
+            <button class="btn-b" style="background:var(--up);color:var(--muted)" onclick="cancelTimer()">Descartar</button>
+            <button class="btn-b" style="background:var(--teal);color:var(--bg)" onclick="commitTimer()">Guardar</button>
+          </div>
+        </div>`;
+      } else {
+        plan.skills.forEach(sk=>{
+          const logged=s.skills[sk], pr=bestOf(sk).best;
+          h += `<div class="row">
+            <div style="min-width:0">
+              <div style="font-size:15px;font-weight:500">${esc(SKILLS[sk].label)}</div>
+              <div class="sub">${logged?`hoy ${logged}s`:"sin registro"}${pr?` · récord ${pr}s`:""}</div>
+            </div>
+            <button class="btn-s" onclick="startPrep('${sk}')">Cronometrar</button>
+          </div>`;
+        });
+        h += `<div style="display:flex;align-items:center;gap:10px;padding-top:12px;margin-top:4px;border-top:1px solid var(--line)">
+          <span class="sub" style="margin:0">CUENTA PARA ACOMODARTE</span>
+          ${[3,5,10].map(n=>`<button class="btn-s" style="padding:6px 12px;${data.prep===n?'border-color:var(--amber);color:var(--amber)':''}" onclick="data.prep=${n};save();render()">${n}s</button>`).join("")}
+        </div>`;
+      }
+      h += `</div>`;
+    }
+
+    if(plan.cindy){
+      const bc=bestCindy();
+      h += `<div class="card"><div class="eyebrow">Vueltas completadas en 20 min</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="number" inputmode="numeric" value="${esc(s.cindy)}" placeholder="0"
+            oninput="sess().cindy=this.value;save()">
+          <div class="sub" style="margin:0">${bc?`RÉCORD ${bc}`:"SIN RÉCORD AÚN"}</div>
+        </div></div>`;
+    }
+
+    if(plan.ex.length){
+      h += `<div class="card"><div class="eyebrow">Ejercicios</div>`;
+      plan.ex.forEach((e,i)=>{
+        const on=!!s.done[i];
+        h += `<button class="check" onclick="sess().done[${i}]=!sess().done[${i}];save();render()">
+          <span class="box ${on?"on":""}">${on?"✓":""}</span>
+          <span class="lbl ${on?"done":""}">${esc(e)}</span></button>`;
+      });
+      h += `</div>`;
+
+      h += `<div class="card"><div class="eyebrow">Adherencia · se mide aparte del resultado</div>`;
+      RULES.forEach((r,i)=>{
+        const on=!!s.rules[i];
+        h += `<button class="check" style="border-bottom:none;padding:9px 0" onclick="sess().rules[${i}]=!sess().rules[${i}];save();render()">
+          <span class="dot ${on?"on":""}"></span>
+          <span style="font-size:13.5px;color:${on?"var(--chalk)":"var(--muted)"}">${esc(r)}</span></button>`;
+      });
+      h += `</div>`;
+    }
+
+    h += `<div class="card"><div class="eyebrow">Peso corporal (opcional)</div>
+      <input type="number" step="0.1" inputmode="decimal" placeholder="kg"
+        value="${esc(data.weights[k]||"")}"
+        oninput="data.weights['${k}']=this.value;save()"></div>`;
+
+    h += `<div class="card"><div class="eyebrow">Nota de la sesión</div>
+      <textarea rows="3" placeholder="Cómo se sintió, qué falló, qué ajustar…"
+        oninput="sess().notes=this.value;save()">${esc(s.notes)}</textarea></div>`;
+  }
+
+  if(tab==="records"){
+    h += `<div class="card"><div class="eyebrow">Récords de aguante</div>`;
+    for(const sk of Object.keys(SKILLS)){
+      const b=bestOf(sk);
+      h += `<div class="row">
+        <div><div style="font-size:15px">${esc(SKILLS[sk].label)}</div>
+        ${b.when?`<div class="sub">${b.when}</div>`:""}</div>
+        <div class="pr" style="color:${b.best?"var(--amber)":"var(--line)"}">${b.best||"—"}<span style="font-size:13px;color:var(--muted)">s</span></div>
+      </div>`;
+    }
+    const bc=bestCindy();
+    h += `<div class="row"><div style="font-size:15px">Cindy · vueltas</div>
+      <div class="pr" style="color:${bc?"var(--teal)":"var(--line)"}">${bc||"—"}</div></div></div>`;
+
+    const ws=Object.entries(data.weights).filter(x=>x[1]).sort((a,b)=>a[0]<b[0]?1:-1).slice(0,8);
+    h += `<div class="card"><div class="eyebrow">Peso · últimos registros</div>`;
+    h += ws.length ? ws.map(([d,w])=>`<div class="row" style="font-family:var(--mono);font-size:13px">
+        <span style="color:var(--muted)">${d}</span><span>${esc(w)} kg</span></div>`).join("")
+      : `<div style="font-size:13.5px;color:var(--muted)">Registra tu peso unos días y aquí verás la tendencia.</div>`;
+    h += `</div>`;
+  }
+
+  if(tab==="semana"){
+    h += `<div class="card"><div class="eyebrow">Últimos 7 días</div><div class="strip">`;
+    for(let i=6;i>=0;i--){
+      const d=addDays(new Date(),-i), on=didTrain(data.sessions[iso(d)]), rest=d.getDay()===0;
+      h += `<div><div class="bar ${on?"on":""} ${rest?"rest":""}"></div>
+        <div class="sub" style="margin-top:5px;font-size:9.5px">${["D","L","M","M","J","V","S"][d.getDay()]}</div></div>`;
+    }
+    h += `</div></div>`;
+
+    h += `<div style="display:flex;gap:12px;margin-bottom:12px">
+      <div class="stat"><div class="eyebrow" style="margin:0">Adherencia 1 sem</div><div class="v" style="color:var(--teal)">${adherence(1)}%</div></div>
+      <div class="stat"><div class="eyebrow" style="margin:0">Adherencia 4 sem</div><div class="v" style="color:var(--amber)">${adherence(4)}%</div></div>
+    </div>`;
+
+    h += `<div class="card"><div class="eyebrow">Recordatorio</div>
+      <p style="font-size:13.5px;line-height:1.55;color:var(--muted);margin:0">
+      Una semana con adherencia alta y sin récords sigue siendo buena semana. El volumen solo sube
+      en las revisiones de 4 semanas, nunca cuando algo se estanca.</p></div>`;
+
+    h += `<div class="card"><div class="eyebrow">Respaldo</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-s" onclick="exportar()">Exportar JSON</button>
+        <button class="btn-s" onclick="importar()">Importar</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5">
+        Los datos viven en este navegador. Si borras datos de sitio, se van. Exporta de vez en cuando.
+      </div></div>`;
+  }
+
+  v.innerHTML=h;
+}
+
+function exportar(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="registro-"+iso(new Date())+".json";
+  a.click();
+}
+function importar(){
+  const i=document.createElement("input");
+  i.type="file"; i.accept="application/json";
+  i.onchange=()=>{
+    const f=i.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{ try{ data=JSON.parse(r.result); save(); render(); }catch(e){ alert("Archivo no válido"); } };
+    r.readAsText(f);
+  };
+  i.click();
+}
+
+document.getElementById("prev").onclick=()=>{ if(T.mode!=="idle") return; cursor=addDays(cursor,-1); render(); };
+document.getElementById("next").onclick=()=>{ if(T.mode!=="idle") return; cursor=addDays(cursor,1); render(); };
+document.querySelectorAll("nav.tabs button").forEach(b=>{
+  b.onclick=()=>{
+    if(T.mode!=="idle") return;
+    tab=b.dataset.tab;
+    document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("on",x===b));
+    render();
+  };
+});
+
+render();
+</script>
+</body>
+</html>
