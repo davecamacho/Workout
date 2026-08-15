@@ -1,0 +1,8 @@
+# Respaldos del registro
+*.json
+registro-*.json
+
+# Basura del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
