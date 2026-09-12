@@ -83,6 +83,15 @@
 
 <script>
 /* ================= datos ================= */
+/* ===== BLOQUE ACTUAL: semanas 5-8 · actualizar cada 4 semanas ===== */
+const BLOQUE = "Bloque 2 · semanas 5-8";
+const META = {
+  handstand:"Cara a pared 4 x 40 s + 5 intentos de kick-up libre",
+  lsit:"3 x máximo — a los 30 s limpios pasas a transiciones",
+  planche:"Lean 4 x 25 s + TUCK PLANCHE 5 x 8-10 s ← nuevo",
+  frontlever:"Advanced tuck SIN liga 4 x max + negativos 3 x 5 s + 1 con liga"
+};
+
 const SKILLS = {
   handstand:{label:"Handstand", hint:"Cara a la pared", cues:[
     "Panza a la pared, no la espalda","Costillas metidas, glúteo apretado",
@@ -269,7 +278,7 @@ function render(){
       ${plan.place?`<div class="sub">${esc(plan.place.toUpperCase())}</div>`:""}</div>`;
 
     if(plan.skills.length){
-      h += `<div class="card"><div class="eyebrow">Bloque skill · aguante en segundos</div>`;
+      h += `<div class="card"><div class="eyebrow">Bloque skill · ${esc(BLOQUE)}</div>`;
 
       if(T.mode==="prep"){
         h += `<div style="text-align:center;padding:14px 0">
@@ -320,6 +329,7 @@ function render(){
                   <button onclick="openCue='${open?"":sk}';render()"
                     style="background:none;border:1px solid var(--line);color:var(--muted);width:20px;height:20px;border-radius:10px;font-size:11px;margin-left:7px;cursor:pointer;vertical-align:middle">${open?"×":"i"}</button>
                 </div>
+                <div style="font-size:11.5px;color:var(--teal);margin-top:4px;line-height:1.4">${esc(META[sk]||"")}</div>
                 <div class="sub">${logged?`hoy ${logged}s`:"sin registro"}${pr?` · récord ${pr}s`:""}</div>
               </div>
               <button class="btn-s" onclick="startPrep('${sk}')">Cronometrar</button>
