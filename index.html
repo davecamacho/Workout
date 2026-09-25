@@ -117,19 +117,21 @@ const PREP = [
 const DAYS = {
   1:{name:"Lunes",title:"Push pesado",place:"Casa",skills:["handstand","lsit","planche"],ex:[
     "Bench Press 5 x 5","Incline DB Press 4 x 8-10","Shoulder Press sentado 4 x 8",
-    "Lateral Raises 4 x 15","Press Francés 3 x 12","Ab Wheel 4 x fallo técnico"]},
+    "Lateral Raises 4 x 15","Press Francés 3 x 12","Ab Wheel 4 x fallo técnico",
+    "Antebrazo: wrist curls 3 x 15 + extensiones 2 x 15"]},
   2:{name:"Martes",title:"Pull explosivo",place:"Parque",skills:["handstand","frontlever"],ex:[
-    "Front Lever Pulls 4 x 5-6","Muscle Ups 3 series","Pull Ups lastradas 3 x 6-8",
-    "Dips lastradas 3 x 8-12","Leg Raises colgado 4 x 12"]},
+    "Muscle Ups 4 x 4-6 ← primero, fresco","Front Lever Pulls 4 x 5-6",
+    "Pull Ups lastradas 3 x 6-8","Dips lastradas 3 x 8-12","Leg Raises colgado 4 x 12"]},
   3:{name:"Miércoles",title:"Piernas bilateral",place:"Casa",skills:[],ex:[
     "Bulgarian Split Squat 4 x 8-10","Romanian Deadlift 4 x 10-12","Goblet Squat 3 x 15",
     "Calf Raises 4 x 20","Plancha con peso 3 x 60 s"]},
   4:{name:"Jueves",title:"Upper con mancuernas",place:"Casa",skills:["handstand","lsit","planche"],ex:[
     "Incline DB Press 4 x 8-10","One-Arm DB Row 4 x 8","Pseudo Planche Push Ups 3 x 8-10",
-    "Lateral Raises 3 x 15","Hammer Curls 3 x 10","Hollow Hold 3 x 45 s"]},
+    "Lateral Raises 3 x 15","Hammer Curls 3 x 10","Hollow Hold 3 x 45 s",
+    "Antebrazo: reverse curls 3 x 12 + extensiones 2 x 15"]},
   5:{name:"Viernes",title:"Front lever + Cindy",place:"Parque",skills:["frontlever","lsit","planche"],cindy:true,ex:[
     "Front lever: advanced tuck SIN liga 4 x max","Negativos desde inverted hang 3 x 5 s",
-    "1 serie con liga (al final)","Cindy 20 min — 5 pull ups / 10 push ups / 15 sit ups"]},
+    "1 serie con liga (al final)","Muscle Ups 3 x 4-6","Cindy 20 min — 5 / 10 / 15"]},
   6:{name:"Sábado",title:"Piernas unilateral",place:"Casa",skills:[],ex:[
     "Zancadas atrás con mancuernas 3 x 12","Skater Squat a la silla 3 x 8-10 por pierna",
     "Hip Thrust 1 pierna 3 x 10","Calf Raises 1 pierna 3 x 15","Copenhagen Plank 3 x 20 s por lado"]},
@@ -366,6 +368,7 @@ function render(){
       });
       h += `</div>`;
 
+    if(plan.skills.length){
       h += `<div class="card"><div class="eyebrow">Adherencia · se mide aparte del resultado</div>`;
       RULES.forEach((r,i)=>{
         const on=!!s.rules[i];
@@ -374,6 +377,7 @@ function render(){
           <span style="font-size:13.5px;color:${on?"var(--chalk)":"var(--muted)"}">${esc(r)}</span></button>`;
       });
       h += `</div>`;
+    }
     }
 
     h += `<div class="card"><div class="eyebrow">Peso corporal (opcional)</div>
