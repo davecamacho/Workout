@@ -83,28 +83,30 @@
 
 <script>
 /* ================= datos ================= */
-/* ===== BLOQUE ACTUAL: semanas 5-8 · actualizar cada 4 semanas ===== */
-const BLOQUE = "Bloque 2 · semanas 5-8";
+/* ===== BLOQUE ACTUAL: semanas 9-12 · actualizar cada 4 semanas ===== */
+const BLOQUE = "Bloque 3 · semanas 9-12";
 const META = {
-  handstand:"Cara a pared 4 x 40 s + 5 intentos de kick-up libre",
-  lsit:"3 x máximo — a los 30 s limpios pasas a transiciones",
-  planche:"Lean 4 x 25 s + TUCK PLANCHE 5 x 8-10 s ← nuevo",
-  frontlever:"Advanced tuck SIN liga 4 x max + negativos 3 x 5 s + 1 con liga"
+  handstand:"LIBRE 5 intentos x max (cronometra este) + heel pulls 3 x 5 + 3 x 30 s pared",
+  lsit:"3 x max + transiciones L-sit → tuck planche 4 x 6 + intentos de V-sit",
+  planche:"TUCK PLANCHE 5 x max + lean 3 x 25 s de calentamiento",
+  frontlever:"STRADDLE 5 x max + one-leg 3 x 10 s + negativos 4 x 8 s"
 };
 
 const SKILLS = {
-  handstand:{label:"Handstand", hint:"Cara a la pared", cues:[
-    "Panza a la pared, no la espalda","Costillas metidas, glúteo apretado",
-    "Empuja el suelo con los dedos","Si molesta la muñeca, usa paralletes"]},
+  handstand:{label:"Handstand libre", hint:"Sin pared", cues:[
+    "Cronometra el LIBRE, no el de pared","Patea SUAVE — casi todos patean de más",
+    "Corrige con los dedos, no con la cadera","Heel pulls: cara a pared, despega un talón y luego el otro",
+    "Pared solo de calentamiento, 3 x 30 s"]},
   lsit:{label:"L-sit", hint:"Piernas rectas", cues:[
     "Piernas rectas, punta estirada","Hombros deprimidos: empuja el suelo hacia abajo",
-    "Si las piernas bajan, corta la serie","A los 30 s limpios: pasa a L-sit → tuck planche"]},
-  planche:{label:"Planche lean", hint:"Codos bloqueados", cues:[
-    "Codos bloqueados — si se doblan, no cuenta","Escápulas protraídas: saca joroba",
-    "Inclínate hasta que tiemble","El tuck sale del lean, no al revés"]},
-  frontlever:{label:"Front lever", hint:"Advanced tuck", cues:[
-    "PRIMERO del viernes — antes que nada","Espalda plana — si se arquea, es tuck falso",
-    "Brazos bloqueados, hombros deprimidos","3-4 series SIN liga, 1 sola con liga al final"]}
+    "Ya pasaste 30 s: mete transiciones L-sit → tuck planche","V-sit: sube las piernas sin que la cadera retroceda"]},
+  planche:{label:"Tuck planche", hint:"Ya no lean", cues:[
+    "Cronometra el TUCK, el lean ya solo calienta","Codos bloqueados — si se doblan, no cuenta",
+    "Escápulas protraídas: saca joroba","Cadera arriba, no colgando entre los brazos"]},
+  frontlever:{label:"Front lever", hint:"Straddle", cues:[
+    "PRIMERO del viernes — antes que nada","Cronometra el STRADDLE aunque sean 3 s",
+    "Espalda plana — si se arquea, no cuenta","Entre más abiertas las piernas, más fácil",
+    "One-leg y negativos después del straddle"]}
 };
 
 const PREP = [
@@ -116,14 +118,14 @@ const PREP = [
 
 const DAYS = {
   1:{name:"Lunes",title:"Push pesado",place:"Casa",skills:["handstand","lsit","planche"],ex:[
-    "Bench Press 5 x 5","Incline DB Press 4 x 8-10","Shoulder Press sentado 4 x 8",
-    "Lateral Raises 4 x 15","Press Francés 3 x 12","Ab Wheel 4 x fallo técnico",
+    "Bench Press 5 x 5","Incline DB Press 4 x 8-10 (tempo 3-0-1)","Dumbbell Chest Fly 3 x 12-15",
+    "Shoulder Press sentado 4 x 8","Lateral Raises 4 x 15","Ab Wheel 4 x fallo técnico",
     "Antebrazo: wrist curls 3 x 15 · reverse curls 3 x 12 · extensiones 2 x 15"]},
   2:{name:"Martes",title:"Pull explosivo",place:"Parque",skills:["handstand","frontlever"],ex:[
     "Muscle Ups 4 x 4-6 ← primero, fresco","Front Lever Pulls 4 x 5-6",
     "Pull Ups lastradas 3 x 6-8","Dips lastradas 3 x 8-12","Leg Raises colgado 4 x 12"]},
   3:{name:"Miércoles",title:"Piernas bilateral",place:"Casa",skills:[],ex:[
-    "Bulgarian Split Squat 4 x 8-10","Romanian Deadlift 4 x 10-12","Goblet Squat 3 x 15",
+    "Front Squat con mancuerna 4 x 8-10","Romanian Deadlift 4 x 10-12","Bulgarian Split Squat 3 x 10",
     "Calf Raises 4 x 20","Plancha con peso 3 x 60 s"]},
   4:{name:"Jueves",title:"Espalda + grosor",place:"Casa",skills:["handstand","lsit","planche"],ex:[
     "One-Arm DB Row 4 x 10","Chest Supported Row 4 x 12","Rear Delt Flyes 3 x 15",
@@ -131,8 +133,8 @@ const DAYS = {
     "Hammer Curls 3 x 10","Hollow Hold 3 x 45 s",
     "Antebrazo: wrist curls 3 x 15 · reverse curls 3 x 12 · extensiones 2 x 15"]},
   5:{name:"Viernes",title:"Front lever + Cindy",place:"Parque",skills:["frontlever","lsit","planche"],cindy:true,ex:[
-    "Front lever: advanced tuck SIN liga 4 x max","Negativos desde inverted hang 3 x 5 s",
-    "1 serie con liga (al final)","Muscle Ups 3 x 4-6","Cindy 20 min — 5 / 10 / 15"]},
+    "Front lever: STRADDLE 5 x max","One-leg 3 x 10 s (alterna pierna)",
+    "Negativos desde inverted hang 4 x 8 s","Muscle Ups 3 x 4-6","Cindy 20 min — 8 / 12 / 16"]},
   6:{name:"Sábado",title:"Piernas unilateral",place:"Casa",skills:[],ex:[
     "Zancadas atrás con mancuernas 3 x 12","Skater Squat a la silla 3 x 8-10 por pierna",
     "Hip Thrust 1 pierna 3 x 10","Calf Raises 1 pierna 3 x 15","Copenhagen Plank 3 x 20 s por lado"]},
