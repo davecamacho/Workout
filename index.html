@@ -83,36 +83,42 @@
 
 <script>
 /* ================= datos ================= */
-/* ===== BLOQUE ACTUAL: semanas 9-12 · actualizar cada 4 semanas ===== */
-const BLOQUE = "Bloque 3 · semanas 9-12";
+/* ===== PROGRAMA 2 · semanas 1-12 · prioridad handstand libre ===== */
+const BLOQUE = "Programa 2 · handstand libre";
 const META = {
-  hs_libre:"LIBRE 5 intentos x max (cronometra este) + heel pulls 3 x 5 + 3 x 30 s pared",
-  lsit:"3 x max — nada más",
-  tuck:"Lean 2 x 20 s (calentar) → TUCK PLANCHE 4 x max → transiciones 2 x 5 (solo jueves)",
-  fl_straddle:"STRADDLE 5 x max + one-leg 3 x 10 s + negativos 4 x 8 s"
+  hs_libre:"PRIORIDAD · 15-20 kick-ups + cronometra el mejor. Nunca al cansancio",
+  vsit:"Compresión 3 x 10 + V-sit intentos 4 x max (arranca de cero)",
+  tuck:"Tuck planche 4 x max + intentos de advanced tuck · a los 25 s cambiamos",
+  fl_straddle:"Straddle 4 x max + negativos 3 x 8 s"
 };
 
-/* Las claves nuevas arrancan sus propios récords desde cero.
-   Las viejas quedan archivadas: solo aparecen en la pestaña Récords. */
 const SKILLS = {
-  hs_libre:{label:"Handstand libre", hint:"Sin pared", cues:[
-    "Cronometra el LIBRE, no el de pared","Patea SUAVE — casi todos patean de más",
-    "Corrige con los dedos, no con la cadera","Heel pulls: cara a pared, despega un talón y luego el otro",
-    "Pared solo de calentamiento, 3 x 30 s"]},
-  lsit:{label:"L-sit", hint:"Piernas rectas", cues:[
-    "Solo 3 series al máximo — ya está en mantenimiento","Piernas rectas, punta estirada",
-    "Hombros deprimidos: empuja el suelo hacia abajo","Las transiciones a tuck planche van en el bloque de planche"]},
-  tuck:{label:"Tuck planche", hint:"Ya no lean", cues:[
-    "Cronometra el TUCK, el lean ya solo calienta","Codos bloqueados — si se doblan, no cuenta",
-    "Escápulas protraídas: saca joroba","Cadera arriba, no colgando entre los brazos"]},
-  fl_straddle:{label:"Front lever straddle", hint:"Straddle", cues:[
-    "PRIMERO del viernes — antes que nada","Cronometra el STRADDLE aunque sean 3 s",
-    "Espalda plana — si se arquea, no cuenta","Entre más abiertas las piernas, más fácil",
-    "One-leg y negativos después del straddle"]},
+  hs_libre:{label:"Handstand libre", hint:"La prioridad", cues:[
+    "VOLUMEN DE INTENTOS, no series duras — 15-20 kick-ups",
+    "Patea SUAVE: casi todos patean de más y se pasan",
+    "Corrige con los DEDOS, no con la cadera",
+    "Córtalo apenas se sienta pesado — cansado no se aprende equilibrio",
+    "Además: 10 min diarios en casa, incluso días libres"]},
+  vsit:{label:"V-sit", hint:"Nuevo — arranca de cero", cues:[
+    "Primero compresión: sentado, piernas rectas, levántalas del suelo 3 x 10",
+    "Del L-sit sube las piernas sin que la cadera retroceda",
+    "Hombros deprimidos y MUY adelante — ahí está el truco",
+    "3-5 s al principio es normal viniendo de 39 s de L-sit"]},
+  tuck:{label:"Tuck planche", hint:"Segundo plano", cues:[
+    "Codos bloqueados — si se doblan, no cuenta",
+    "Escápulas protraídas: saca joroba",
+    "Cadera arriba, no colgando entre los brazos",
+    "Mete 2-3 intentos de advanced tuck al final (rodillas lejos del pecho)"]},
+  fl_straddle:{label:"Front lever straddle", hint:"Segundo plano", cues:[
+    "Primero del viernes, antes que nada",
+    "Espalda plana — si se arquea, no cuenta",
+    "Entre más abiertas las piernas, más fácil",
+    "Negativos después del straddle"]},
 
-  handstand:{label:"Handstand en pared", hint:"", archivado:"bloques 1-2", cues:[]},
-  planche:{label:"Planche lean", hint:"", archivado:"bloques 1-2", cues:[]},
-  frontlever:{label:"Front lever one-leg", hint:"", archivado:"bloques 1-2", cues:[]}
+  handstand:{label:"Handstand en pared", hint:"", archivado:"programa 1", cues:[]},
+  planche:{label:"Planche lean", hint:"", archivado:"programa 1", cues:[]},
+  frontlever:{label:"Front lever one-leg", hint:"", archivado:"programa 1", cues:[]},
+  lsit:{label:"L-sit", hint:"", archivado:"programa 1 · 39 s", cues:[]}
 };
 
 const PREP = [
@@ -123,31 +129,36 @@ const PREP = [
 ];
 
 const DAYS = {
-  1:{name:"Lunes",title:"Push pesado",place:"Casa",skills:["hs_libre","lsit","tuck"],ex:[
-    "DB Bench Press 4 x 10 (pausa 1 s abajo)","Incline DB Press 4 x 8-10 (tempo 3-0-1)","Dumbbell Chest Fly 3 x 12-15",
-    "Shoulder Press sentado 4 x 8","Lateral Raises 4 x 15","Ab Wheel 4 x fallo técnico",
+  1:{name:"Lunes",title:"Push pesado",place:"Casa",skills:["hs_libre","vsit","tuck"],ex:[
+    "DB Bench Press 4 x 10 (pausa 1 s abajo)","Incline DB Press 4 x 8-10 (tempo 3-0-1)",
+    "Dumbbell Chest Fly 3 x 12-15","Shoulder Press sentado 4 x 8","Lateral Raises 4 x 15",
+    "Ab Wheel 4 x fallo técnico",
     "Antebrazo: wrist curls 3 x 15 · reverse curls 3 x 12 · extensiones 2 x 15"]},
   2:{name:"Martes",title:"Pull explosivo",place:"Parque",skills:["hs_libre","fl_straddle"],ex:[
     "Muscle Ups 4 x 4-6 ← primero, fresco","Front Lever Pulls 4 x 5-6",
-    "Pull Ups lastradas 3 x 6-8","Dips con chaleco 4 x 8-12 (torso inclinado) ← pecho pesado","Leg Raises colgado 4 x 12"]},
-  3:{name:"Miércoles",title:"Piernas bilateral",place:"Casa",skills:[],ex:[
-    "Front Squat con mancuerna 4 x 8-10","Romanian Deadlift 4 x 10-12","Bulgarian Split Squat 3 x 10",
-    "Calf Raises 4 x 20","Plancha con peso 3 x 60 s"]},
-  4:{name:"Jueves",title:"Espalda + grosor",place:"Casa",skills:["hs_libre","lsit","tuck"],ex:[
+    "Pull Ups lastradas 3 x 6-8","Dips con chaleco 4 x 8-12 (torso inclinado)",
+    "Leg Raises colgado 4 x 12",
+    "Windshield wipers colgado 3 x 8 por lado ← oblicuos"]},
+  3:{name:"Miércoles",title:"Piernas completo",place:"Casa",skills:["hs_libre"],ex:[
+    "Front Squat con mancuerna 4 x 8-10","Romanian Deadlift 4 x 10-12",
+    "Bulgarian Split Squat 3 x 10 por pierna","Hip Thrust 1 pierna 3 x 10",
+    "Calf Raises 1 pierna 3 x 15","Copenhagen Plank 3 x 25 s por lado ← oblicuos",
+    "Plancha lateral con peso 2 x 30 s por lado"]},
+  4:{name:"Jueves",title:"Espalda + grosor",place:"Casa",skills:["hs_libre","vsit","tuck"],ex:[
     "One-Arm DB Row 4 x 10","Chest Supported Row 4 x 12","Rear Delt Flyes 3 x 15",
     "DB Shrugs 3 x 15","Pseudo Planche Push Ups 3 x 8-10","Lateral Raises 3 x 15",
     "Hammer Curls 3 x 10","Hollow Hold 3 x 45 s",
     "Antebrazo: wrist curls 3 x 15 · reverse curls 3 x 12 · extensiones 2 x 15"]},
-  5:{name:"Viernes",title:"Front lever + Cindy",place:"Parque",skills:["fl_straddle","lsit","tuck"],cindy:true,ex:[
-    "Front lever: STRADDLE 5 x max","One-leg 3 x 10 s (alterna pierna)",
-    "Negativos desde inverted hang 4 x 8 s","Muscle Ups 3 x 4-6","Cindy 20 min — 5 / 10 / 15"]},
-  6:{name:"Sábado",title:"Piernas unilateral",place:"Casa",skills:[],ex:[
-    "Zancadas atrás con mancuernas 3 x 12","Skater Squat a la silla 3 x 8-10 por pierna",
-    "Hip Thrust 1 pierna 3 x 10","Calf Raises 1 pierna 3 x 15","Copenhagen Plank 3 x 20 s por lado"]},
-  0:{name:"Domingo",title:"Descanso",place:"",skills:[],ex:[]}
+  5:{name:"Viernes",title:"Front lever + Cindy",place:"Parque",skills:["fl_straddle","hs_libre"],cindy:true,ex:[
+    "Front lever: STRADDLE 4 x max","Negativos desde inverted hang 3 x 8 s",
+    "Muscle Ups 3 x 4-6","Cindy 20 min — 5 / 10 / 15"]},
+  6:{name:"Sábado",title:"Solo handstand",place:"Casa · 10 min",skills:["hs_libre"],ex:[
+    "10 min de handstand — kick-ups, heel pulls, intentos libres. Nada más."]},
+  0:{name:"Domingo",title:"Solo handstand",place:"Casa · 10 min",skills:["hs_libre"],ex:[
+    "10 min de handstand — kick-ups, heel pulls, intentos libres. Nada más."]}
 };
 
-const RULES = ["Skill primero, con todo fresco","Ningún skill al fallo","Brazos bloqueados en holds"];
+const RULES = ["Skill primero, con todo fresco","Handstand cortado antes del cansancio","Brazos bloqueados en holds"];
 const KEY = "trainlog-v1";
 
 /* ================= estado ================= */
@@ -286,6 +297,28 @@ function commitTimer(){
   render();
 }
 
+/* ---- correcciones: borrar registros malos ---- */
+function borrarHoy(sk){
+  const s=sess();
+  if(s.skills[sk]==null) return;
+  delete s.skills[sk];
+  save(); flash=null; render();
+}
+function borrarRecord(sk){
+  const b=bestOf(sk);
+  if(!b.best) return;
+  if(!confirm(`¿Borrar el registro de ${b.best}s del ${b.when}?\n\nSolo se borra ese dato de ese día. El resto queda igual.`)) return;
+  const v=data.sessions[b.when];
+  if(v && v.skills) delete v.skills[sk];
+  save(); flash=null; render();
+}
+function resetTodo(){
+  if(!confirm("¿Borrar TODOS tus registros?\n\nSe van sesiones, récords, pesos y notas. Esto no se puede deshacer.")) return;
+  if(!confirm("Última confirmación. ¿Seguro?")) return;
+  data={sessions:{},weights:{},prep:data.prep||5};
+  save(); flash=null; render();
+}
+
 /* ================= métricas ================= */
 function bestOf(skill){
   let best=0,when=null;
@@ -394,7 +427,8 @@ function render(){
                     style="background:none;border:1px solid var(--line);color:var(--muted);width:20px;height:20px;border-radius:10px;font-size:11px;margin-left:7px;cursor:pointer;vertical-align:middle">${open?"×":"i"}</button>
                 </div>
                 <div style="font-size:11.5px;color:var(--teal);margin-top:4px;line-height:1.4">${esc(META[sk]||"")}</div>
-                <div class="sub">${logged?`hoy ${logged}s`:"sin registro"}${pr?` · récord ${pr}s`:""}</div>
+                <div class="sub">${logged?`hoy ${logged}s`:"sin registro"}${pr?` · récord ${pr}s`:""}${
+                  logged?` <button onclick="borrarHoy('${sk}')" style="background:none;border:none;color:var(--red);font-size:11px;cursor:pointer;padding:0 4px;font-family:var(--mono)">borrar</button>`:""}</div>
               </div>
               <button class="btn-s" onclick="startPrep('${sk}')">Cronometrar</button>
             </div>
@@ -453,8 +487,8 @@ function render(){
   }
 
   if(tab==="records"){
-    const COLOR={hs_libre:"var(--amber)",lsit:"var(--teal)",tuck:"#7FA8E0",fl_straddle:"#E5614A"};
-    const HEX={hs_libre:"#F0B429",lsit:"#4FC3B0",tuck:"#7FA8E0",fl_straddle:"#E5614A"};
+    const COLOR={hs_libre:"var(--amber)",vsit:"var(--teal)",tuck:"#7FA8E0",fl_straddle:"#E5614A"};
+    const HEX={hs_libre:"#F0B429",vsit:"#4FC3B0",tuck:"#7FA8E0",fl_straddle:"#E5614A"};
     h += `<div class="card"><div class="eyebrow">Récords · bloque actual</div>`;
     for(const sk of Object.keys(SKILLS)){
       if(SKILLS[sk].archivado) continue;
@@ -463,7 +497,10 @@ function render(){
         <div style="display:flex;align-items:baseline;justify-content:space-between">
           <div><div style="font-size:15px">${esc(SKILLS[sk].label)}</div>
           ${b.when?`<div class="sub">mejor marca ${b.when}</div>`:""}</div>
-          <div class="pr" style="color:${b.best?COLOR[sk]:"var(--line)"}">${b.best||"—"}<span style="font-size:13px;color:var(--muted)">s</span></div>
+          <div style="text-align:right">
+            <div class="pr" style="color:${b.best?COLOR[sk]:"var(--line)"}">${b.best||"—"}<span style="font-size:13px;color:var(--muted)">s</span></div>
+            ${b.best?`<button onclick="borrarRecord('${sk}')" style="background:none;border:none;color:var(--red);font-size:11px;cursor:pointer;padding:2px 0;font-family:var(--mono)">corregir</button>`:""}
+          </div>
         </div>
         ${spark(sk,HEX[sk]||"#F0B429")}
       </div>`;
@@ -520,6 +557,7 @@ function render(){
       <div style="display:flex;gap:10px">
         <button class="btn-s" onclick="exportar()">Exportar JSON</button>
         <button class="btn-s" onclick="importar()">Importar</button>
+        <button class="btn-s" style="border-color:var(--red);color:var(--red)" onclick="resetTodo()">Borrar todo</button>
       </div>
       <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5">
         Los datos viven en este navegador. Si borras datos de sitio, se van. Exporta de vez en cuando.
