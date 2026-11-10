@@ -86,7 +86,7 @@
 /* ===== PROGRAMA 2 · semanas 1-12 · prioridad handstand libre ===== */
 const BLOQUE = "Programa 2 · handstand libre";
 const META = {
-  hs_libre:"PRIORIDAD · 15-20 kick-ups + cronometra el mejor. Nunca al cansancio",
+  hs_libre:"PRIORIDAD · pared 2 x 30 s → heel pulls 3 x 5 → 15-20 kick-ups (cronometra el mejor)",
   vsit:"Compresión 3 x 10 + V-sit intentos 4 x max (arranca de cero)",
   tuck:"Tuck planche 4 x max + intentos de advanced tuck · a los 25 s cambiamos",
   fl_straddle:"Straddle 4 x max + negativos 3 x 8 s"
@@ -94,7 +94,9 @@ const META = {
 
 const SKILLS = {
   hs_libre:{label:"Handstand libre", hint:"La prioridad", cues:[
-    "VOLUMEN DE INTENTOS, no series duras — 15-20 kick-ups",
+    "El bloque son 3 partes: pared 2 x 30 s → heel pulls 3 x 5 → 15-20 kick-ups",
+    "Sáb y dom: solo heel pulls + kick-ups, sin pared",
+    "VOLUMEN DE INTENTOS, no series duras",
     "Patea SUAVE: casi todos patean de más y se pasan",
     "Corrige con los DEDOS, no con la cadera",
     "Córtalo apenas se sienta pesado — cansado no se aprende equilibrio",
@@ -152,10 +154,10 @@ const DAYS = {
   5:{name:"Viernes",title:"Front lever + Cindy",place:"Parque",skills:["fl_straddle","hs_libre"],cindy:true,ex:[
     "Front lever: STRADDLE 4 x max","Negativos desde inverted hang 3 x 8 s",
     "Muscle Ups 3 x 4-6","Cindy 20 min — 5 / 10 / 15"]},
-  6:{name:"Sábado",title:"Solo handstand",place:"Casa · 10 min",skills:["hs_libre"],ex:[
-    "10 min de handstand — kick-ups, heel pulls, intentos libres. Nada más."]},
-  0:{name:"Domingo",title:"Solo handstand",place:"Casa · 10 min",skills:["hs_libre"],ex:[
-    "10 min de handstand — kick-ups, heel pulls, intentos libres. Nada más."]}
+  6:{name:"Sábado",title:"Solo handstand",place:"Casa · 10 min",solo_hs:true,skills:["hs_libre"],ex:[
+    "Muñecas 60 s","Heel pulls 3 x 5","15-20 kick-ups libres"]},
+  0:{name:"Domingo",title:"Solo handstand",place:"Casa · 10 min",solo_hs:true,skills:["hs_libre"],ex:[
+    "Muñecas 60 s","Heel pulls 3 x 5","15-20 kick-ups libres"]}
 };
 
 const RULES = ["Skill primero, con todo fresco","Handstand cortado antes del cansancio","Brazos bloqueados en holds"];
@@ -426,7 +428,8 @@ function render(){
                   <button onclick="openCue='${open?"":sk}';render()"
                     style="background:none;border:1px solid var(--line);color:var(--muted);width:20px;height:20px;border-radius:10px;font-size:11px;margin-left:7px;cursor:pointer;vertical-align:middle">${open?"×":"i"}</button>
                 </div>
-                <div style="font-size:11.5px;color:var(--teal);margin-top:4px;line-height:1.4">${esc(META[sk]||"")}</div>
+                <div style="font-size:11.5px;color:var(--teal);margin-top:4px;line-height:1.4">${esc(
+                  (plan.solo_hs && sk==="hs_libre") ? "Heel pulls 3 x 5 → 15-20 kick-ups. Sin pared, sin cansarte." : (META[sk]||""))}</div>
                 <div class="sub">${logged?`hoy ${logged}s`:"sin registro"}${pr?` · récord ${pr}s`:""}${
                   logged?` <button onclick="borrarHoy('${sk}')" style="background:none;border:none;color:var(--red);font-size:11px;cursor:pointer;padding:0 4px;font-family:var(--mono)">borrar</button>`:""}</div>
               </div>
