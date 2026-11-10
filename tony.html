@@ -113,29 +113,43 @@ const SKILLS = {
 };
 
 const PREP = [
-  "Caminar en el lugar 2 min",
+  "Calentamiento: caminar en el lugar 2 min",
   "Círculos de brazos 10 adelante + 10 atrás",
   "Círculos de cadera 10 por lado",
   "Sentarse y pararse de la silla 5 veces, sin peso"
 ];
 
 const A = [
-  "Sentarse y pararse de la silla 3 x 8-10",
-  "Flexiones en pared o mesa 3 x 8-10 (la última al máximo)",
-  "Remo con liga sentado 3 x 12",
-  "Puente de glúteo 3 x 12",
-  "Dead bug 2 x 8 por lado",
-  "Sentadilla en la pared 3 x aguante",
-  "Plancha de rodillas 3 x aguante"
+  {t:"Sentarse y pararse de la silla · 3 x 8-10",
+   c:"Silla normal, brazos cruzados al pecho. Bajas DESPACIO hasta tocar y subes. Si cuesta, usa una silla más alta o ayúdate con las manos. Es el ejercicio más importante del día."},
+  {t:"Flexiones en pared o mesa · 3 x 8-10 (la última al máximo)",
+   c:"Manos en la pared a la altura del pecho, pies separados de ella. Entre más lejos los pies, más difícil — empieza cerca. Cuando salgan fáciles pasa a la mesa de la cocina, y después a un escalón."},
+  {t:"Remo con liga sentado · 3 x 12",
+   c:"Sentado en el tapete, piernas estiradas, la liga alrededor de los pies. Jalas los codos hacia atrás apretando los omóplatos, como si quisieras detener un lápiz con la espalda."},
+  {t:"Puente de glúteo · 3 x 12",
+   c:"Boca arriba, rodillas dobladas, pies apoyados. Subes la cadera apretando las nalgas y pausas un segundo arriba. Si lo sientes en la espalda baja, aprieta las nalgas más fuerte."},
+  {t:"Dead bug · 2 x 8 por lado",
+   c:"Boca arriba, brazos apuntando al techo y rodillas a 90°. Bajas un brazo y la pierna CONTRARIA, despacio, sin que la espalda baja se despegue del suelo. Si se despega, baja menos."},
+  {t:"Sentadilla en la pared · 3 x aguante ⏱",
+   c:"Espalda pegada a la pared, te deslizas hasta donde aguantes — no tiene que ser 90° al principio. Peso en los talones. Entre más abajo, más difícil."},
+  {t:"Plancha de rodillas · 3 x aguante ⏱",
+   c:"Antebrazos y rodillas en el tapete. Cadera en línea con la espalda, ni levantada ni hundida. Aprieta abdomen y nalgas. Corta cuando la cadera se caiga."}
 ];
 const B = [
-  "Peso muerto rumano 3 x 10 (sin peso las 2 primeras semanas)",
-  "Press de hombro sentado 3 x 10",
-  "Remo con mancuerna apoyado 3 x 10 por lado",
-  "Marcha de glúteo 2 x 8 por lado",
-  "Bird dog 2 x 8 por lado",
-  "Puente de glúteo isométrico 3 x aguante",
-  "Plancha de rodillas 3 x aguante"
+  {t:"Peso muerto rumano · 3 x 10",
+   c:"SIN PESO las dos primeras semanas, solo el movimiento. Mancuernas al frente de los muslos, rodillas semiflexionadas. Empujas la cadera hacia atrás bajando las mancuernas pegadas a las piernas. La espalda RECTA siempre — si se redondea, no bajes tanto."},
+  {t:"Press de hombro sentado · 3 x 10",
+   c:"Sentado con la espalda apoyada, mancuernas a la altura de los hombros, subes hasta estirar los brazos. Si 22 lb es mucho, usa una sola mancuerna agarrada con las dos manos."},
+  {t:"Remo con mancuerna apoyado · 3 x 10 por lado",
+   c:"Una rodilla y una mano sobre la silla, espalda plana. La otra mano jala la mancuerna hacia la cadera, codo pegado al cuerpo."},
+  {t:"Marcha de glúteo · 2 x 8 por lado",
+   c:"Desde el puente arriba, levantas un pie unos centímetros sin que la cadera se vaya de lado. Alternas. Lo difícil es que la cadera no se mueva."},
+  {t:"Bird dog · 2 x 8 por lado",
+   c:"En cuatro puntos, estiras el brazo y la pierna contraria al mismo tiempo. Despacio, sin arquear la espalda. Imagina un vaso de agua en la espalda baja que no se debe derramar."},
+  {t:"Puente de glúteo isométrico · 3 x aguante ⏱",
+   c:"El mismo puente, pero te quedas arriba apretando las nalgas todo el tiempo que aguantes. El trabajo está en apretar, no solo en estar arriba."},
+  {t:"Plancha de rodillas · 3 x aguante ⏱",
+   c:"Antebrazos y rodillas en el tapete. Cadera en línea con la espalda, ni levantada ni hundida. Aprieta abdomen y nalgas. Corta cuando la cadera se caiga."}
 ];
 
 const DAYS = {
@@ -163,6 +177,7 @@ const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(data)); }catc
 let cursor = new Date();
 let tab = "hoy";
 let openCue = "";
+let openEx = -1;
 let flash = null;
 
 /* ---- sparkline: historial de un skill como línea ---- */
@@ -453,9 +468,20 @@ function render(){
       h += `<div class="card"><div class="eyebrow">Ejercicios</div>`;
       plan.ex.forEach((e,i)=>{
         const on=!!s.done[i];
-        h += `<button class="check" onclick="sess().done[${i}]=!sess().done[${i}];save();render()">
-          <span class="box ${on?"on":""}">${on?"✓":""}</span>
-          <span class="lbl ${on?"done":""}">${esc(e)}</span></button>`;
+        const titulo = (typeof e==="string") ? e : e.t;
+        const como   = (typeof e==="string") ? null : e.c;
+        const abierto = openEx===i;
+        h += `<div style="border-bottom:1px solid var(--line)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="check" style="border-bottom:none;flex:1;min-width:0" onclick="sess().done[${i}]=!sess().done[${i}];save();render()">
+              <span class="box ${on?"on":""}">${on?"✓":""}</span>
+              <span class="lbl ${on?"done":""}">${esc(titulo)}</span>
+            </button>
+            ${como?`<button onclick="openEx=${abierto?-1:i};render()" aria-label="Cómo se hace"
+              style="background:none;border:1px solid var(--line);color:var(--muted);width:24px;height:24px;flex-shrink:0;border-radius:12px;font-size:12px;cursor:pointer">${abierto?"×":"i"}</button>`:""}
+          </div>
+          ${abierto&&como?`<div style="font-size:13px;color:var(--muted);line-height:1.6;padding:0 0 12px 32px">${esc(como)}</div>`:""}
+        </div>`;
       });
       h += `</div>`;
 
@@ -581,12 +607,12 @@ function importar(){
   i.click();
 }
 
-document.getElementById("prev").onclick=()=>{ if(T.mode!=="idle") return; cursor=addDays(cursor,-1); flash=null; render(); };
-document.getElementById("next").onclick=()=>{ if(T.mode!=="idle") return; cursor=addDays(cursor,1); flash=null; render(); };
+document.getElementById("prev").onclick=()=>{ if(T.mode!=="idle") return; cursor=addDays(cursor,-1); flash=null; openEx=-1; render(); };
+document.getElementById("next").onclick=()=>{ if(T.mode!=="idle") return; cursor=addDays(cursor,1); flash=null; openEx=-1; render(); };
 document.querySelectorAll("nav.tabs button").forEach(b=>{
   b.onclick=()=>{
     if(T.mode!=="idle") return;
-    tab=b.dataset.tab; flash=null;
+    tab=b.dataset.tab; flash=null; openEx=-1;
     document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("on",x===b));
     render();
   };
