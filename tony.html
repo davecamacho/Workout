@@ -83,6 +83,89 @@
 
 <script>
 /* ================= datos ================= */
+/* ===== figuras animadas =====
+   polilínea: mano → codo → hombro → cadera → rodilla → pie
+   la cabeza se calcula desde la línea cadera→hombro, así nunca se encima */
+const SUELO='<line x1="4" y1="94" x2="116" y2="94" stroke="currentColor" stroke-width="1.5" opacity=".3"/>';
+const PARED_D='<line x1="100" y1="8" x2="100" y2="94" stroke="currentColor" stroke-width="1.5" opacity=".3"/>';
+const PARED_I='<line x1="30" y1="8" x2="30" y2="94" stroke="currentColor" stroke-width="1.5" opacity=".3"/>';
+const SILLA='<path d="M34 68 H66 M34 68 V43" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>';
+const SILLA2='<path d="M34 66 H66 M34 66 V41" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>';
+const BANCO='<line x1="56" y1="78" x2="98" y2="78" stroke="currentColor" stroke-width="2" opacity=".35"/>';
+
+const FIG={
+  sentar:{props:SUELO+SILLA,
+    a:[[74,50],[61,49],[48,48],[46,68],[68,68],[68,90]],
+    b:[[78,40],[65,39],[52,38],[52,60],[52,75],[52,90]]},
+  flexpared:{props:SUELO+PARED_D,
+    a:[[97,43],[81,42],[66,42],[54,58],[44,74],[34,90]],
+    b:[[97,43],[86,34],[74,43],[60,58],[48,74],[38,90]]},
+  remoliga:{props:SUELO,
+    a:[[86,57],[67,56],[48,55],[48,78],[70,80],[92,82]],
+    b:[[64,60],[29,66],[48,55],[48,78],[70,80],[92,82]]},
+  puente:{props:SUELO, h:[27,84],
+    a:[[22,90],[30,87],[38,84],[64,84],[82,72],[86,90]],
+    b:[[22,90],[30,87],[38,84],[64,66],[82,66],[86,90]]},
+  deadbug:{props:SUELO, h:[39,82],
+    a:[[50,54],[50,68],[50,82],[70,82],[70,66],[84,66]],
+    b:[[26,64],[38,72],[50,82],[70,82],[80,74],[94,70]]},
+  wallsit:{props:SUELO+PARED_I,
+    a:[[68,54],[52,52],[36,50],[36,70],[62,70],[62,90]]},
+  plancha:{props:SUELO,
+    a:[[88,90],[74,90],[74,72],[48,76],[28,90],[16,82]]},
+  rdl:{props:SUELO, pesa:true,
+    a:[[58,60],[56,48],[52,36],[52,58],[52,74],[52,90]],
+    b:[[72,70],[72,58],[72,46],[46,58],[50,74],[50,90]]},
+  press:{props:SUELO+'<line x1="42" y1="68" x2="78" y2="68" stroke="currentColor" stroke-width="2" opacity=".35"/>',
+    pesa2:true, h:[60,26],
+    base:'<path d="M60 36 V64 M52 64 H68 M55 64 L52 90 M65 64 L68 90" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>',
+    a:[[32,34],[32,50],[50,40],[70,40],[88,50],[88,34]],
+    b:[[40,10],[45,24],[50,40],[70,40],[75,24],[80,10]]},
+  remomanc:{props:SUELO+BANCO, pesa:true,
+    a:[[74,85],[73,70],[72,54],[46,60],[38,76],[34,90]],
+    b:[[72,60],[80,47],[72,54],[46,60],[38,76],[34,90]]},
+  marcha:{props:SUELO, h:[27,84],
+    extra:'<path d="M64 68 L80 70 L84 90" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>',
+    a:[[22,90],[30,87],[38,84],[64,66],[84,64],[88,88]],
+    b:[[22,90],[30,87],[38,84],[64,66],[66,46],[80,50]]},
+  birddog:{props:SUELO,
+    extra:'<path d="M70 64 V90 M50 64 L44 77 L44 90" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>',
+    a:[[78,90],[78,77],[76,64],[46,64],[34,76],[34,90]],
+    b:[[104,48],[90,56],[76,64],[46,64],[32,60],[18,56]]}
+};
+
+/* cabeza = hombro + 11px en la dirección cadera→hombro */
+function cabeza(pose,fija){
+  if(fija) return fija;
+  const [sx,sy]=pose[2], [hx,hy]=pose[3];
+  const dx=sx-hx, dy=sy-hy, d=Math.hypot(dx,dy)||1;
+  return [ +(sx+dx/d*11).toFixed(1), +(sy+dy/d*11).toFixed(1) ];
+}
+
+function svgEj(nombre){
+  const f=FIG[nombre]; if(!f) return "";
+  const P=p=>p.map(c=>c.join(",")).join(" ");
+  const D="2.6s", SP="0.45 0 0.25 1;0.45 0 0.25 1", KT="0;0.5;1";
+  const mov=!!f.b;
+  const ca=cabeza(f.a,f.h), cb=mov?cabeza(f.b,f.h):ca;
+  const pesas = f.pesa2?[0,5]:(f.pesa?[0]:[]);
+  const an=(attr,v1,v2)=>`<animate attributeName="${attr}" dur="${D}" repeatCount="indefinite"
+      values="${v1};${v2};${v1}" calcMode="spline" keyTimes="${KT}" keySplines="${SP}"/>`;
+  return `<svg viewBox="0 0 120 100" role="img" aria-label="Animación del movimiento"
+    style="width:100%;max-width:240px;height:auto;display:block;margin:10px auto 4px;color:var(--chalk);
+    background:var(--up);border-radius:10px">
+    ${f.props||""}${f.extra||""}${f.base||""}
+    <polyline points="${P(f.a)}" fill="none" stroke="currentColor" stroke-width="3.5"
+      stroke-linecap="round" stroke-linejoin="round">${mov?an("points",P(f.a),P(f.b)):""}</polyline>
+    <circle cx="${ca[0]}" cy="${ca[1]}" r="6.5" fill="none" stroke="currentColor" stroke-width="3.5">
+      ${mov?an("cx",ca[0],cb[0])+an("cy",ca[1],cb[1]):""}</circle>
+    ${pesas.map(i=>`<line x1="${f.a[i][0]-5}" y1="${f.a[i][1]}" x2="${f.a[i][0]+5}" y2="${f.a[i][1]}"
+      stroke="currentColor" stroke-width="4" stroke-linecap="round">
+      ${mov?an("x1",f.a[i][0]-5,f.b[i][0]-5)+an("y1",f.a[i][1],f.b[i][1])
+           +an("x2",f.a[i][0]+5,f.b[i][0]+5)+an("y2",f.a[i][1],f.b[i][1]):""}</line>`).join("")}
+  </svg>${mov?"":'<div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px">POSICIÓN · SE AGUANTA</div>'}`;
+}
+
 /* ===== PROGRAMA DE ARRANQUE · 4 días ===== */
 const BLOQUE = "Programa de arranque";
 const META = {
@@ -120,35 +203,35 @@ const PREP = [
 ];
 
 const A = [
-  {t:"Sentarse y pararse de la silla · 3 x 8-10",
+  {t:"Sentarse y pararse de la silla · 3 x 8-10", f:"sentar",
    c:"Silla normal, brazos cruzados al pecho. Bajas DESPACIO hasta tocar y subes. Si cuesta, usa una silla más alta o ayúdate con las manos. Es el ejercicio más importante del día."},
-  {t:"Flexiones en pared o mesa · 3 x 8-10 (la última al máximo)",
+  {t:"Flexiones en pared o mesa · 3 x 8-10 (la última al máximo)", f:"flexpared",
    c:"Manos en la pared a la altura del pecho, pies separados de ella. Entre más lejos los pies, más difícil — empieza cerca. Cuando salgan fáciles pasa a la mesa de la cocina, y después a un escalón."},
-  {t:"Remo con liga sentado · 3 x 12",
+  {t:"Remo con liga sentado · 3 x 12", f:"remoliga",
    c:"Sentado en el tapete, piernas estiradas, la liga alrededor de los pies. Jalas los codos hacia atrás apretando los omóplatos, como si quisieras detener un lápiz con la espalda."},
-  {t:"Puente de glúteo · 3 x 12",
+  {t:"Puente de glúteo · 3 x 12", f:"puente",
    c:"Boca arriba, rodillas dobladas, pies apoyados. Subes la cadera apretando las nalgas y pausas un segundo arriba. Si lo sientes en la espalda baja, aprieta las nalgas más fuerte."},
-  {t:"Dead bug · 2 x 8 por lado",
+  {t:"Dead bug · 2 x 8 por lado", f:"deadbug",
    c:"Boca arriba, brazos apuntando al techo y rodillas a 90°. Bajas un brazo y la pierna CONTRARIA, despacio, sin que la espalda baja se despegue del suelo. Si se despega, baja menos."},
-  {t:"Sentadilla en la pared · 3 x aguante ⏱",
+  {t:"Sentadilla en la pared · 3 x aguante ⏱", f:"wallsit",
    c:"Espalda pegada a la pared, te deslizas hasta donde aguantes — no tiene que ser 90° al principio. Peso en los talones. Entre más abajo, más difícil."},
-  {t:"Plancha de rodillas · 3 x aguante ⏱",
+  {t:"Plancha de rodillas · 3 x aguante ⏱", f:"plancha",
    c:"Antebrazos y rodillas en el tapete. Cadera en línea con la espalda, ni levantada ni hundida. Aprieta abdomen y nalgas. Corta cuando la cadera se caiga."}
 ];
 const B = [
-  {t:"Peso muerto rumano · 3 x 10",
+  {t:"Peso muerto rumano · 3 x 10", f:"rdl",
    c:"SIN PESO las dos primeras semanas, solo el movimiento. Mancuernas al frente de los muslos, rodillas semiflexionadas. Empujas la cadera hacia atrás bajando las mancuernas pegadas a las piernas. La espalda RECTA siempre — si se redondea, no bajes tanto."},
-  {t:"Press de hombro sentado · 3 x 10",
-   c:"Sentado con la espalda apoyada, mancuernas a la altura de los hombros, subes hasta estirar los brazos. Si 22 lb es mucho, usa una sola mancuerna agarrada con las dos manos."},
-  {t:"Remo con mancuerna apoyado · 3 x 10 por lado",
+  {t:"Press de hombro sentado · 3 x 10", f:"press",
+   c:"Sentado con la espalda apoyada, mancuernas a la altura de los hombros y CODOS ABIERTOS hacia los lados, no pegados al cuerpo. Subes hasta estirar los brazos arriba. Si 22 lb es mucho, usa una sola mancuerna agarrada con las dos manos. (Esta animación es de frente para que se vea la apertura de codos.)"},
+  {t:"Remo con mancuerna apoyado · 3 x 10 por lado", f:"remomanc",
    c:"Una rodilla y una mano sobre la silla, espalda plana. La otra mano jala la mancuerna hacia la cadera, codo pegado al cuerpo."},
-  {t:"Marcha de glúteo · 2 x 8 por lado",
+  {t:"Marcha de glúteo · 2 x 8 por lado", f:"marcha",
    c:"Desde el puente arriba, levantas un pie unos centímetros sin que la cadera se vaya de lado. Alternas. Lo difícil es que la cadera no se mueva."},
-  {t:"Bird dog · 2 x 8 por lado",
+  {t:"Bird dog · 2 x 8 por lado", f:"birddog",
    c:"En cuatro puntos, estiras el brazo y la pierna contraria al mismo tiempo. Despacio, sin arquear la espalda. Imagina un vaso de agua en la espalda baja que no se debe derramar."},
-  {t:"Puente de glúteo isométrico · 3 x aguante ⏱",
+  {t:"Puente de glúteo isométrico · 3 x aguante ⏱", f:"puente",
    c:"El mismo puente, pero te quedas arriba apretando las nalgas todo el tiempo que aguantes. El trabajo está en apretar, no solo en estar arriba."},
-  {t:"Plancha de rodillas · 3 x aguante ⏱",
+  {t:"Plancha de rodillas · 3 x aguante ⏱", f:"plancha",
    c:"Antebrazos y rodillas en el tapete. Cadera en línea con la espalda, ni levantada ni hundida. Aprieta abdomen y nalgas. Corta cuando la cadera se caiga."}
 ];
 
@@ -480,7 +563,7 @@ function render(){
             ${como?`<button onclick="openEx=${abierto?-1:i};render()" aria-label="Cómo se hace"
               style="background:none;border:1px solid var(--line);color:var(--muted);width:24px;height:24px;flex-shrink:0;border-radius:12px;font-size:12px;cursor:pointer">${abierto?"×":"i"}</button>`:""}
           </div>
-          ${abierto&&como?`<div style="font-size:13px;color:var(--muted);line-height:1.6;padding:0 0 12px 32px">${esc(como)}</div>`:""}
+          ${abierto&&como?`<div style="padding:0 0 12px 0">${e.f?svgEj(e.f):""}<div style="font-size:13px;color:var(--muted);line-height:1.6;padding-left:32px">${esc(como)}</div></div>`:""}
         </div>`;
       });
       h += `</div>`;
